@@ -67,9 +67,6 @@ function playSample(name, velocity = 1) {
     source.start(0);
 }
 
-// ==========================================
-// INTERAZIONE PAD (MOUSE & TASTIERA)
-// ==========================================
 function flashPad(pad) {
     pad.classList.add("active");
     setTimeout(() => pad.classList.remove("active"), 100);
