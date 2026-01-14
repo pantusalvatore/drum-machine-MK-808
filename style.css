@@ -5,7 +5,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    user-select: none; /* Impedisce selezione testo accidentale mentre si suona */
+    user-select: none; 
 }
 
 body {
@@ -166,7 +166,7 @@ body {
     box-shadow: 0 0 0 #8c1b1b, inset 0 2px 5px rgba(0,0,0,0.4);
 }
 
-/* Colore specifico Tasto CLEAR */
+
 .transport-btn.clear {
     background: #757575;
     box-shadow: 0 4px 0 #424242, 0 6px 5px rgba(0,0,0,0.4);
