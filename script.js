@@ -21,7 +21,7 @@ async function loadSample(name) {
 }
 
 async function loadAllSamples() {
-    const sampleNames = ["kick", "snare", "clap", "rim", "closed_hat", "open_hat", "crash", "perc", "perc2"];
+    const sampleNames = ["kick", "snare", "clap", "rim", "closed_hat", "open_hat", "crash", "perc", "perc2","tom"];
     for (let name of sampleNames) {
         const buf = await loadSample(name);
         if (buf) buffers[name] = buf;
@@ -67,6 +67,7 @@ function playSample(name, velocity = 1) {
     source.start(0);
 }
 
+
 function flashPad(pad) {
     pad.classList.add("active");
     setTimeout(() => pad.classList.remove("active"), 100);
@@ -110,7 +111,7 @@ function updateStepColor(step) {
     step.style.boxShadow = `0 0 10px ${color}, 0 2px 0 ${color}`;
 }
 
-// Inizializzazione Grid
+
 document.querySelectorAll(".seq-row").forEach(row => {
     const stepsContainer = row.querySelector(".steps");
     stepsContainer.innerHTML = '';
@@ -287,57 +288,53 @@ function bufferToWave(abuffer, len) {
     return new Blob([buffer], { type: "audio/wav" });
 }
 
-
 const canvas = document.getElementById('paintCanvas');
 const ctx = canvas.getContext('2d');
-function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+
+
+function resizeCanvas() { 
+    canvas.width = window.innerWidth; 
+    canvas.height = window.innerHeight; 
+}
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
+
 const instrumentColors = {
     'kick': '#ff5252', 'snare': '#18ffff', 'clap': '#e040fb', 'rim': '#b2ff59',
-    'closed_hat': '#ffff00', 'open_hat': '#ffab40', 'crash': '#ffffff', 'perc': '#ff4081', 'perc2': '#7c4dff'
+    'closed_hat': '#ffff00', 'open_hat': '#ffab40', 'crash': '#ffffff', 'perc': '#ff4081', 'perc2': '#7c4dff','tom': '#ff9800'
 };
 
-let particles = [];
-class PaintParticle {
-    constructor(x, y, color) {
-        this.x = x; this.y = y; this.color = color;
-        const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 5 + 2;
-        this.vx = Math.cos(angle) * speed;
-        this.vy = Math.sin(angle) * speed;
-        this.radius = Math.random() * 15 + 5;
-        this.life = 1.0;
-        this.decay = Math.random() * 0.02 + 0.01;
-        this.gravity = 0.15;
-    }
-    update() {
-        this.x += this.vx; this.y += this.vy; this.vy += this.gravity;
-        this.life -= this.decay; this.radius *= 0.96;
-    }
-    draw(ctx) {
-        ctx.save(); ctx.globalAlpha = this.life; ctx.fillStyle = this.color;
-        ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fill(); ctx.restore();
-    }
-}
+
+let flashColor = { r: 0, g: 0, b: 0, alpha: 0 };
 
 function triggerExplosion(soundName) {
-    const x = Math.random() * canvas.width;
-    const y = Math.random() * canvas.height;
-    const color = instrumentColors[soundName] || '#ffffff';
-    for (let i = 0; i < 20; i++) particles.push(new PaintParticle(x, y, color));
+    // Convertiamo il colore HEX in RGB per gestirlo meglio
+    const hex = instrumentColors[soundName] || '#ffffff';
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    
+  
+    flashColor = { r, g, b, alpha: 0.6 };
 }
 
-function animatePaint() {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+function animate() {
+    
+    ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    for (let i = particles.length - 1; i >= 0; i--) {
-        particles[i].update();
-        particles[i].draw(ctx);
-        if (particles[i].life <= 0 || particles[i].radius < 0.5) particles.splice(i, 1);
+
+    
+    if (flashColor.alpha > 0) {
+        ctx.fillStyle = `rgba(${flashColor.r}, ${flashColor.g}, ${flashColor.b}, ${flashColor.alpha})`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        
+        flashColor.alpha -= 0.05; 
     }
-    requestAnimationFrame(animatePaint);
+
+    requestAnimationFrame(animate);
 }
-animatePaint();
+
+
+animate();
